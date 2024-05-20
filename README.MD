@@ -10,10 +10,10 @@
 
 ## Krok 2: Instalacja skryptu Tlem_AutoRequest.user.js
 
-1. Przejdź do strony skryptu [Tlem_AutoRequest.user.js ](https://github.com/Rutra09/tlemtlem_autorequest/raw/main/Tlem_AutoRequest.user.js).
+1. Przejdź do strony skryptu [Tlem_AutoRequest.user.js ](https://raw.githubusercontent.com/Rutra09/tlem_autorequest/main/Tlem_AutoRequest.user.js).
 2. Tampermonkey powinien automatycznie wykryć skrypt i wyświetlić okno dialogowe.
 3. Kliknij przycisk "Zainstaluj" lub "Install" w oknie dialogowym Tampermonkey.
-4. Skrypt tlem_autopromptv2.user.js powinien zostać zainstalowany i gotowy do użycia.
+4. Skrypt Tlem_AutoRequest.user.js powinien zostać zainstalowany i gotowy do użycia.
 
 ## Krok 3: Używanie skryptu
 
