@@ -17,8 +17,7 @@
 
 ## Krok 3: Używanie skryptu
 
-Po zainstalowaniu skryptu tlem_autopromptv2.user.js, powinien wyświetlać się przycisk ze znakiem zapytania, po kliknięciu otwierać okno z przygotowanym promptem, guzikiem do kopiowania, i dodatkową opcją przeszukania mojej bazy w poszukiwaniu tego pytania.
-
+Po zainstalowaniu skryptu tlem_autorequest.user.js, i wejści na kurs z sql i odświeżeniu strony, zadania powinny zacząć się rozwiązywać.
 
 
 **Uwaga:** Upewnij się, że masz włączoną obsługę skryptów użytkownika w ustawieniach Tampermonkey, aby skrypt działał poprawnie.
