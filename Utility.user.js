@@ -18,6 +18,10 @@ function randomInt(min, max) {
 
 function goToNextLesson() {
     let nextLessonid = handlers.menus.nextId;
+    if(nextLessonid == 0) {
+        alert("Nie ma następnej lekcji lub jeszcze jej nie odblokowałeś");
+        return;
+    }
     handlers.lekcja.load(nextLessonid);
 }
 
