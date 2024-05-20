@@ -8,9 +8,9 @@
 // @updateURL    https://github.com/Rutra09/tlem_autoprompt/raw/master/Tlem_AutoPrompt2.user.js
 // @downloadURL  https://github.com/Rutra09/tlem_autoprompt/raw/master/Tlem_AutoPrompt2.user.js
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=t-lem.com
-// @require  https://gist.github.com/raw/2625891/waitForKeyElements.js
-// @grant       GM_xmlhttpRequest
-// @grant       GM_cookie
+// @require      https://gist.github.com/raw/2625891/waitForKeyElements.js
+// @grant        GM_xmlhttpRequest
+// @grant        GM_cookie
 // ==/UserScript==
 
 function getAnswer(id) {
@@ -26,7 +26,7 @@ function getAnswer(id) {
 }
 
 function getLessonId() {
-    return window.location.href.split(":")[1];
+    return window.location.href.split(":")[2];
 }
 
 function getFileName() {
@@ -47,59 +47,53 @@ function randomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-function sendFakedAnswer(code) {    
-    let act = {
-        id: "lekcja",
-        module: "lekcja",
-        params: ["compile", getLessonId(), [{
-            name: getFileName(),
-            code: encodeURIComponent(code)
-        }]],
-        last_ping_time: 0,
-        ping_count: randomInt(1, 40),
-    }
-    for(var i =0; i < code.length; i++){
-        act["params"][3]["deltaTime"] += randomInt(1, 10);
-        act["params"][3]["deltaClick"] += randomInt(1, 2);
-        act["params"][3]["deltaKeys"] += randomInt(1, 2);
-        break;
-    }
-    let data  = new URLSearchParams();
-    data.append("act", JSON.stringify(act));
-    
+function insertCodeSQL(code, file) {
+    waitForKeyElements("#sql_cmd", function () {
+        setTimeout(() => {
+            console.log(code);
+            ace.edit("sql_cmd").setValue(code);
+            ace.edit("sql_cmd").clearSelection();
+            handlers.sql.process()   
+            goToNextLesson();    
+        }, 250);
+    }, true);
+}
 
-    fetch("https://edu.t-lem.com/", {
-        "credentials": "include",
-        "headers": {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:125.0) Gecko/20100101 Firefox/125.0",
-            "Accept": "application/json, text/javascript, */*; q=0.01",
-            "Accept-Language": "pl,en-US;q=0.7,en;q=0.3",
-            "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-            "X-Requested-With": "XMLHttpRequest",
-            "Sec-Fetch-Dest": "empty",
-            "Sec-Fetch-Mode": "cors",
-            "Sec-Fetch-Site": "same-origin"
-        },
-        "referrer": "https://edu.t-lem.com/",
-        "body": data,
-        "method": "POST",
-        "mode": "cors"
+function submitAnswer() {
+    getAnswer(getLessonId()).then((response) => {
+        console.log(response.responseText);
+        if(response.responseText == "No data for this lesson") {
+            alert("W bazie nie ma jeszcze tego zadania. \nSkontatkuj się z Arturkiem albo Gąską. (Ewentualnie zadzwoń do J.P.)")
+            return;
+        }
+        let data = JSON.parse(response.responseText);
+        let code = data["plik.cpp"]
+        insertCodeSQL(code);
     });
 }
 
-function loadGUI() {
-
+function goToNextLesson() {
+    let lekcjaNextButton = document.getElementById("lekcja_next");
+    if (lekcjaNextButton == null) {
+        return;
+    }
+    lekcjaNextButton.click();
+    setTimeout(() =>  {
+        submitAnswer()
+        console.log("Next lesson");
+    }, 500);
+    
 }
 
 function lessonDetector() {
-
+    waitForKeyElements("#lekcja_next", () => submitAnswer(), true);
 }
 
 function init() {
-    loadGUI();
+    lessonDetector();
 }
 
-(function() {
+(function () {
     'use strict';
     init();
 })();
