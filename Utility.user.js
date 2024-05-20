@@ -30,6 +30,7 @@ function getLessonId() {
 
 function determineLessonTypes() {
     return new Promise((resolve, reject) => {
+        waitForKeyElements("#toolbox-refresh", () => {
         let lessonTypes = []
         let activeLekcja = document.querySelectorAll("#lekcja-items > *.active");
         activeLekcja.forEach(function (element) {
@@ -37,6 +38,7 @@ function determineLessonTypes() {
             lessonTypes.push(lessonType);
         });
         resolve(lessonTypes);
+    });
     });
 }
 
