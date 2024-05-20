@@ -18,13 +18,22 @@ function randomInt(min, max) {
 
 function goToNextLesson() {
     let nextLessonid = handlers.menus.nextId;
-    if(nextLessonid == 0) {
-        handlers.common.notify("Błąd Skryptu","Nie ma następnej lekcji lub jeszcze jej nie odblokowałeś","error","") 
-
-        return false;
+    // if(nextLessonid == 0) {
+    //     handlers.common.notify("Błąd Skryptu","Nie ma następnej lekcji lub jeszcze jej nie odblokowałeś","error","") 
+    //     return false;
+    // }
+    for (let i = 0; i < 10; i++) {
+        setTimeout(() => {
+            if (nextLessonid == 0) {
+                nextLessonid = handlers.menus.nextId;
+            } else {
+                handlers.lekcja.load(nextLessonid);
+                return true;
+            }
+        }, 100 * i);
     }
-    handlers.lekcja.load(nextLessonid);
-    return true;
+    handlers.common.notify("Błąd Skryptu","Nie ma następnej lekcji lub jeszcze jej nie odblokowałeś","error","") 
+    return false;
 }
 
 function getLessonId() {
