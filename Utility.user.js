@@ -19,10 +19,12 @@ function randomInt(min, max) {
 function goToNextLesson() {
     let nextLessonid = handlers.menus.nextId;
     if(nextLessonid == 0) {
-        alert("Nie ma następnej lekcji lub jeszcze jej nie odblokowałeś");
-        return;
+        handlers.common.notify("Błąd Skryptu","Nie ma następnej lekcji lub jeszcze jej nie odblokowałeś","error","") 
+
+        return false;
     }
     handlers.lekcja.load(nextLessonid);
+    return true;
 }
 
 function getLessonId() {

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Tlem AutoRequest
 // @namespace    http://tampermonkey.net/
-// @version      1.2
+// @version      1.3b
 // @description  try to take over the world!
 // @author       ArturM
 // @match        https://edu.t-lem.com/
@@ -17,23 +17,26 @@
 
 
 function insertCodeSQL(code, callback) {
-    code.split("").forEach(() => {
-        fakeCounter(1, 1);
+    waitForKeyElements("#sql_cmd", function () {
+        code.split("").forEach(() => {
+            fakeCounter(1, 1);
+        });
+        ace.edit("sql_cmd").setValue(code);
+        ace.edit("sql_cmd").clearSelection();
+        console.log(handlers.sql.cmd, handlers.lekcja)
+        handlers.sql.process();
     });
-    ace.edit("sql_cmd").setValue(code);
-    ace.edit("sql_cmd").clearSelection();
-    console.log(handlers.sql.cmd, handlers.lekcja)
-    handlers.sql.process();
 }
 
 function handleSQL() {
     let id = getLessonId();
     getAnswer(id).then((response) => {
         if(response.responseText == "No data for this lesson") 
-            alert("W bazie nie ma jeszcze tego zadania. \nSkontatkuj się z Arturkiem albo Gąską. (Ewentualnie zadzwoń do J.P.)");
+            // alert("W bazie nie ma jeszcze tego zadania. \nSkontatkuj się z Arturkiem albo Gąską. (Ewentualnie zadzwoń do J.P.)");
+        handlers.common.notify("Błąd Skryptu","W bazie nie ma jeszcze tego zadania. \nSkontatkuj się z Arturkiem albo Gąską. (Ewentualnie zadzwoń do J.P.)","error","") 
          else {
             let data = JSON.parse(response.responseText);
-            let code = data["plik.cpp"]
+            let code = data["plik.cpp"].replace(/\\n/g, "\n")
             insertCodeSQL(code);
             setTimeout(() => {
                 makeNextLessonSQL();
@@ -43,8 +46,11 @@ function handleSQL() {
 }
 
 function makeNextLessonSQL() {
-    goToNextLesson();
-    handleSQL();
+    if(goToNextLesson()) {
+        setTimeout(() => {
+            handleSQL();
+        }, 100);
+    }
 }
 
 function lessonDetector() {
