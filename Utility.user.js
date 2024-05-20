@@ -22,7 +22,7 @@ function goToNextLesson() {
 }
 
 function getLessonId() {
-    return window.location.href.split(":")[2];
+    return handlers.lekcja.currentId;
 }
 
 function determineLessonTypes() {
