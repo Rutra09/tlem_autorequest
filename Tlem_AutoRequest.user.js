@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Tlem AutoRequest
 // @namespace    http://tampermonkey.net/
-// @version      1.1b
+// @version      1.2
 // @description  try to take over the world!
 // @author       ArturM
 // @match        https://edu.t-lem.com/
@@ -15,62 +15,54 @@
 // ==/UserScript==
 
 
-function insertCodeSQL(code) {
-    waitForKeyElements("#sql_cmd", function () {
-        setTimeout(() => {
-            console.log(code);
-            ace.edit("sql_cmd").setValue(code);
-            ace.edit("sql_cmd").clearSelection();
-            console.log(handlers.sql.cmd, handlers.lekcja)
-            handlers.sql.process();
-        }, 250);
-    }, true);
-}
 
-function submitAnswer() {
-    getAnswer(getLessonId()).then((response) => {
-        console.log(response.responseText);
-        if(response.responseText == "No data for this lesson") {
-            alert("W bazie nie ma jeszcze tego zadania. \nSkontatkuj się z Arturkiem albo Gąską. (Ewentualnie zadzwoń do J.P.)")
-            return;
-        }
-        let data = JSON.parse(response.responseText);
-        let code = data["plik.cpp"]
-        insertCodeSQL(code);
+function insertCodeSQL(code, callback) {
+    code.split("").forEach(() => {
+        fakeCounter(1, 1);
     });
+    ace.edit("sql_cmd").setValue(code);
+    ace.edit("sql_cmd").clearSelection();
+    console.log(handlers.sql.cmd, handlers.lekcja)
+    handlers.sql.process();
 }
 
 function handleSQL() {
     let id = getLessonId();
     getAnswer(id).then((response) => {
-        if(response.responseText == "No data for this lesson") {
-            alert("W bazie nie ma jeszcze tego zadania. \nSkontatkuj się z Arturkiem albo Gąską. (Ewentualnie zadzwoń do J.P.)")
-            return;
+        if(response.responseText == "No data for this lesson") 
+            alert("W bazie nie ma jeszcze tego zadania. \nSkontatkuj się z Arturkiem albo Gąską. (Ewentualnie zadzwoń do J.P.)");
+         else {
+            let data = JSON.parse(response.responseText);
+            let code = data["plik.cpp"]
+            insertCodeSQL(code);
+            setTimeout(() => {
+                makeNextLessonSQL();
+            }, 100);
         }
-        let data = JSON.parse(response.responseText);
-        let code = data["plik.cpp"]
-        insertCodeSQL(code);
-        goToNextLesson();
     });
 }
 
+function makeNextLessonSQL() {
+    goToNextLesson();
+    handleSQL();
+}
 
 function lessonDetector() {
-    waitForKeyElements("#lekcja-items", () => {
-        determineLessonTypes().then((lessonTypes) => {
-            switch (lessonTypes[0]) {
-                case "code":
-                    break;
-                case "sql":
+    console.log("Lesson Detector");
+    determineLessonTypes().then((lessonTypes) => {
+        console.log(lessonTypes);
+        switch (lessonTypes[0]) {
+            case "code":
 
-                    submitAnswer();
-                    break;
-                default:
-                    alert("Nieznany typ lekcji");
-            }
-        });
+                break;
+            case "sql":
+                handleSQL();
+                break;
+            default:
+        }
     });
 }
+
 
 function init() {
     lessonDetector();

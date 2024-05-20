@@ -17,11 +17,8 @@ function randomInt(min, max) {
 }
 
 function goToNextLesson() {
-    let lekcjaNextButton = document.getElementById("lekcja_next");
-    if (lekcjaNextButton == null) {
-        return;
-    }
-    lekcjaNextButton.click();
+    let nextLessonid = handlers.menus.nextId;
+    handlers.lekcja.load(nextLessonid);
 }
 
 function getLessonId() {
@@ -30,15 +27,25 @@ function getLessonId() {
 
 function determineLessonTypes() {
     return new Promise((resolve, reject) => {
-        waitForKeyElements("#toolbox-refresh", () => {
-        let lessonTypes = []
-        let activeLekcja = document.querySelectorAll("#lekcja-items > *.active");
-        activeLekcja.forEach(function (element) {
-            let lessonType = element.id.split("-")[1].slice("t_".length);
-            lessonTypes.push(lessonType);
+        if (document.querySelectorAll("li[id^=lekcja-].active").length > 0) {
+            let lessonTypes = [];
+            let lessons = document.querySelectorAll("li[id^=lekcja-].active")
+            lessons.forEach((lesson) => {
+                let lessonType = lesson.id.split("_")[1];
+                lessonTypes.push(lessonType);
+            });
+            resolve(lessonTypes);
+            return;
+        }
+        waitForKeyElements("li[id^=lekcja-].active", function () {
+            let lessonTypes = [];
+            let lessons = document.querySelectorAll("li[id^=lekcja-].active")
+            lessons.forEach((lesson) => {
+                let lessonType = lesson.id.split("_")[1];
+                lessonTypes.push(lessonType);
+            });
+            resolve(lessonTypes);
         });
-        resolve(lessonTypes);
-    });
     });
 }
 
@@ -52,4 +59,15 @@ function getAnswer(id) {
             }
         })
     })
+}
+
+function fakeCounter(clicks, time) {
+    handlers.lekcja.deltaKeys = clicks;
+    handlers.lekcja.deltaClick = clicks*2;
+    handlers.lekcja.deltaTime = time;
+}
+function addFakeCounter(clicks, time) {
+    handlers.lekcja.deltaKeys += clicks;
+    handlers.lekcja.deltaClick += clicks*2;
+    handlers.lekcja.deltaTime += time;
 }
